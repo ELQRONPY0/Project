@@ -1,12 +1,19 @@
 import 'package:ai_tumor_detect/core/constant/string.dart';
 import 'package:ai_tumor_detect/core/routing/router.dart';
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ai_tumor_detect/features/onboarding/view_model/cubit/onboarding_cubit.dart';
 
 void main() {
-  runApp(MyApp(appRouter: AppRouter()));
+  runApp(DevicePreview(
+    enabled: !kReleaseMode,
+    builder: (BuildContext context) => MyApp(
+      appRouter: AppRouter(),
+    ),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -37,6 +44,7 @@ class MyApp extends StatelessWidget {
           themeMode: ThemeMode.system,
           onGenerateRoute: AppRouter.generateRoute,
           initialRoute: Routes.splash,
+          builder: DevicePreview.appBuilder,
         ),
       ),
     );

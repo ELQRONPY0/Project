@@ -1,3 +1,5 @@
+import 'package:ai_tumor_detect/core/constant/color.dart';
+import 'package:ai_tumor_detect/core/helper/app_regex.dart';
 import 'package:ai_tumor_detect/core/widgets/arrow_back.dart';
 import 'package:ai_tumor_detect/core/widgets/custom_button.dart';
 import 'package:ai_tumor_detect/core/widgets/custom_text_field.dart';
@@ -6,12 +8,59 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  bool hasLowerCase = false;
+
+  bool hasUpperCase = false;
+
+  bool hasNumber = false;
+
+  bool hasSpecialCharacter = false;
+
+  bool hasMinLength = false;
+
+  bool isPasswordObscureText = true;
+
+  late TextEditingController passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    passwordController = TextEditingController(); // تهيئة المتغير هنا
+    passwordControllerListener();
+  }
+
+  void passwordControllerListener() {
+    passwordController.addListener(() {
+      final password = passwordController.text;
+      setState(() {
+        hasLowerCase = AppRegex.hasLowerCase(password);
+        hasUpperCase = AppRegex.hasUpperCase(password);
+        hasNumber = AppRegex.hasNumber(password);
+        hasSpecialCharacter = AppRegex.hasSpecialCharacter(password);
+        hasMinLength = AppRegex.hasMinLength(password);
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    passwordController
+        .dispose(); // تأكد من التخلص من المتحكم عند التخلص من الودجت
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColor.white,
       body: SafeArea(
         child: ScrollConfiguration(
           behavior: const ScrollBehavior(),
@@ -50,7 +99,11 @@ class SignUpScreen extends StatelessWidget {
                     ),
                   ),
                   CustomTextField(
-                    validator: (value) {},
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your name';
+                      }
+                    },
                     hintText: 'Your Name',
                     prefixIcon: const Icon(Icons.person),
                   ),
@@ -64,7 +117,13 @@ class SignUpScreen extends StatelessWidget {
                     ),
                   ),
                   CustomTextField(
-                    validator: (value) {},
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          !AppRegex.isPhoneNumberValid(value)) {
+                        return 'Please enter a valid phone number';
+                      }
+                    },
                     hintText: 'Enter Phone Number',
                     prefixIcon: const Icon(Icons.phone),
                   ),
@@ -78,7 +137,13 @@ class SignUpScreen extends StatelessWidget {
                     ),
                   ),
                   CustomTextField(
-                    validator: (value) {},
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          !AppRegex.isEmailValid(value)) {
+                        return 'Please enter a valid email';
+                      }
+                    },
                     hintText: 'Enter Email',
                     prefixIcon: const Icon(Icons.email_outlined),
                   ),
@@ -92,7 +157,13 @@ class SignUpScreen extends StatelessWidget {
                     ),
                   ),
                   CustomTextField(
-                    validator: (value) {},
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          !AppRegex.isPasswordValid(value)) {
+                        return 'Please enter a valid password';
+                      }
+                    },
                     hintText: 'Enter Password',
                     prefixIcon: const Icon(Icons.lock_outline),
                   ),
@@ -106,7 +177,11 @@ class SignUpScreen extends StatelessWidget {
                     ),
                   ),
                   CustomTextField(
-                    validator: (value) {},
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a valid password';
+                      }
+                    },
                     hintText: 'Confirm Password',
                     prefixIcon: const Icon(Icons.lock_outline),
                   ),
