@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:io';
 
 import 'package:ai_tumor_detect/core/network/api_constants.dart';
@@ -14,7 +16,6 @@ enum DataSource {
   TIMEOUT,
   UNKNOWN,
   UNEXPECTED,
-
   INTERNAL_SERVER_ERROR,
   CONNECT_TIMEOUT,
   RECEIVE_TIMEOUT,

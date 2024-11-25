@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "999607488029",
+    "project_id": "ai-tumor-detect",
+    "storage_bucket": "ai-tumor-detect.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:999607488029:android:323d83d1228d0cc03f00f4",
+        "android_client_info": {
+          "package_name": "com.example.ai_tumor_detect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDM3kPUS9dN2x7Sa5AH8tw7czcx5zUuj3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

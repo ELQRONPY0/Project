@@ -4,6 +4,8 @@ import 'package:ai_tumor_detect/core/widgets/arrow_back.dart';
 import 'package:ai_tumor_detect/core/widgets/custom_button.dart';
 import 'package:ai_tumor_detect/core/widgets/custom_text_field.dart';
 import 'package:ai_tumor_detect/features/auth/login/view/widget/custom_other_login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -137,6 +139,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                   CustomTextField(
+                    onchange: (data) {},
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
@@ -186,7 +189,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     prefixIcon: const Icon(Icons.lock_outline),
                   ),
                   SizedBox(height: 14.h),
-                  CustomButton(text: 'Sign Up', onPressed: () {}),
+                  CustomButton(
+                      text: 'Sign Up',
+                      onPressed: () {
+                        var auth = FirebaseAuth.instance;
+                        auth.createUserWithEmailAndPassword(
+                            email: 'email', password: 'password');
+                      }),
                   SizedBox(height: 8.h),
                   Align(
                     alignment: Alignment.center,
