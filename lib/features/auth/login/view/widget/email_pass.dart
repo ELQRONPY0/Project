@@ -4,70 +4,89 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EmailAndPass extends StatefulWidget {
-  const EmailAndPass({super.key});
+  final Function(String)
+      onEmailChanged; // دالة لإرسال القيمة عند تغيير البريد الإلكتروني
+  final Function(String)
+      onPasswordChanged; // دالة لإرسال القيمة عند تغيير كلمة المرور
+  final GlobalKey<FormState> formKey;
+
+  const EmailAndPass({
+    super.key,
+    required this.onEmailChanged,
+    required this.onPasswordChanged,
+    required this.formKey,
+  });
 
   @override
   State<EmailAndPass> createState() => _EmailAndPassState();
 }
 
 class _EmailAndPassState extends State<EmailAndPass> {
-  bool hasLowerCase = false;
-  bool hasUpperCase = false;
-  bool hasNumber = false;
-  bool hasSpecialCharacter = false;
-  bool hasMinLength = false;
   bool isPasswordObscureText = true;
+
+  late TextEditingController emailController;
   late TextEditingController passwordController;
 
   @override
   void initState() {
     super.initState();
 
+    emailController = TextEditingController();
     passwordController = TextEditingController();
+
+    // إضافة المستمعين
+    emailController.addListener(_emailChanged);
+    passwordController.addListener(_passwordChanged);
   }
 
-  void passwordControllerListener() {
-    final password = passwordController.text;
-    passwordController.addListener(() {
-      setState(() {
-        hasLowerCase = AppRegex.hasLowerCase(password);
-        hasUpperCase = AppRegex.hasUpperCase(password);
-        hasNumber = AppRegex.hasNumber(password);
-        hasSpecialCharacter = AppRegex.hasSpecialCharacter(password);
-        hasMinLength = AppRegex.hasMinLength(password);
-      });
-    });
+  // دالة للتعامل مع التغيير في البريد الإلكتروني
+  void _emailChanged() {
+    widget
+        .onEmailChanged(emailController.text); // ارسال التغيير إلى الـ callback
   }
+
+  // دالة للتعامل مع التغيير في كلمة المرور
+  void _passwordChanged() {
+    widget.onPasswordChanged(
+        passwordController.text); // ارسال التغيير إلى الـ callback
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: widget.formKey,
       child: Column(
         children: [
+          // البريد الإلكتروني
           CustomTextField(
+            controller: emailController,
             hintText: 'Email',
-            validator: (value) {
-              if (value == null ||
-                  value.isEmpty ||
-                  !AppRegex.isEmailValid(value)) {
-                return 'Please enter a valid email';
-              }
-            },
-            prefixIcon: Icon(
-              Icons.email_outlined,
-              size: 20.sp,
-            ),
+            validator: (value) =>
+                (value?.isEmpty == true || !AppRegex.isEmailValid(value!))
+                    ? 'Please enter a valid email'
+                    : null,
+            prefixIcon: Icon(Icons.email_outlined, size: 20.sp),
           ),
           SizedBox(height: 16.h),
+
+          // كلمة المرور
           CustomTextField(
+            controller: passwordController,
             hintText: 'Password',
-            validator: (value) {
-              if (value == null ||
-                  value.isEmpty ||
-                  !AppRegex.isPasswordValid(value)) {
-                return 'Please enter a valid password';
-              }
-            },
+            isObscureText: isPasswordObscureText,
+            validator: (value) =>
+                (value?.isEmpty == true || !AppRegex.isPasswordValid(value!))
+                    ? 'Please enter a valid password'
+                    : null,
             prefixIcon: Icon(Icons.lock_outline, size: 20.sp),
           ),
         ],
