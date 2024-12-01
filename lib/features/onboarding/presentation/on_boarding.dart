@@ -1,8 +1,8 @@
 import 'package:ai_tumor_detect/core/constant/color.dart';
-import 'package:ai_tumor_detect/core/utils/on_boarding_list.dart';
-import 'package:ai_tumor_detect/features/onboarding/view_model/cubit/onboarding_cubit.dart';
-import 'package:ai_tumor_detect/features/onboarding/view_model/cubit/onboarding_state.dart';
-import 'package:ai_tumor_detect/features/auth/login/view/screen/login_screen.dart';
+import 'package:ai_tumor_detect/features/onboarding/widget/on_boarding_list.dart';
+import 'package:ai_tumor_detect/features/onboarding/presentation/cubit/onboarding_cubit.dart';
+import 'package:ai_tumor_detect/features/onboarding/presentation/cubit/onboarding_state.dart';
+import 'package:ai_tumor_detect/features/auth/presentation/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -82,8 +82,8 @@ class _OnboardingState extends State<Onboarding> {
                           width: cubit.currentIndex == i ? 20 : 18,
                           decoration: BoxDecoration(
                             color: cubit.currentIndex == i
-                                ? AppColor.darkBlue
-                                : AppColor.lightBlue700,
+                                ? AppColor.scandryColor
+                                : AppColor.lightCyan,
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
@@ -97,7 +97,7 @@ class _OnboardingState extends State<Onboarding> {
                       style: TextStyle(
                         fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
-                        color: AppColor.darkBlue,
+                        color: AppColor.scandryColor,
                       ),
                     ),
                     SizedBox(height: 16.h),
@@ -107,7 +107,7 @@ class _OnboardingState extends State<Onboarding> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16.sp,
-                        color: AppColor.darkBlue,
+                        color: AppColor.scandryColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

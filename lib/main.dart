@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ai_tumor_detect/features/onboarding/view_model/cubit/onboarding_cubit.dart';
+import 'package:ai_tumor_detect/features/onboarding/presentation/cubit/onboarding_cubit.dart';
 import 'firebase_options.dart';
 
 void main() async {

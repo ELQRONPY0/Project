@@ -1,5 +1,5 @@
 import 'package:ai_tumor_detect/core/helper/app_regex.dart';
-import 'package:ai_tumor_detect/core/widgets/custom_text_field.dart';
+import 'package:ai_tumor_detect/features/auth/presentation/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

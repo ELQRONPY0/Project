@@ -1,9 +1,10 @@
 import 'package:ai_tumor_detect/core/constant/string.dart';
-import 'package:ai_tumor_detect/features/auth/login/view/screen/login_screen.dart';
-import 'package:ai_tumor_detect/features/auth/signUp/view/screen/sign_up_screen.dart';
-import 'package:ai_tumor_detect/features/home/home_screen.dart';
-import 'package:ai_tumor_detect/features/onboarding/view/on_boarding.dart';
-import 'package:ai_tumor_detect/features/onboarding/view/splash.dart';
+import 'package:ai_tumor_detect/features/auth/presentation/screens/login_screen.dart';
+import 'package:ai_tumor_detect/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:ai_tumor_detect/presentation/screens/diagnosis_page.dart';
+import 'package:ai_tumor_detect/presentation/screens/home_screen.dart';
+import 'package:ai_tumor_detect/features/onboarding/presentation/screen/onboarding_screen.dart';
+import 'package:ai_tumor_detect/presentation/screens/splash.dart';
 import 'package:flutter/material.dart';
 
 class AppRouter {
@@ -19,6 +20,9 @@ class AppRouter {
         return MaterialPageRoute(builder: (context) => const SignUpScreen());
       case Routes.homeScreen:
         return MaterialPageRoute(builder: (context) => const HomeScreen());
+      case Routes.diagnosisPage:
+        return MaterialPageRoute(builder: (context) => const DiagnosisPage());
+
       default:
         return MaterialPageRoute(
           builder: (context) => Scaffold(
