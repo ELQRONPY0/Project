@@ -8,7 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final Function(int)? onNavigate; // وظيفة للتنقل بين الصفحات
+
+  const HomePage({super.key, this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class HomePage extends StatelessWidget {
                   Text(
                     "Welcome, User!",
                     style: TextStyle(
-                      color: AppColor.scandryColor,
+                      color: AppColor.secondaryColor,
                       fontSize: 20.sp,
                       fontWeight: FontWeight.bold,
                       fontFamily: GoogleFonts.aBeeZee().fontFamily,
@@ -41,19 +43,27 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 32.h),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/diagnosisPage');
+                  if (onNavigate != null) {
+                    onNavigate!(1); // تغيير الفهرس إلى صفحة Diagnosis
+                  }
                 },
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: AppColor.lightCyan,
+                    gradient: const LinearGradient(
+                      colors: [
+                        AppColor.primaryColor,
+                        Color.fromARGB(255, 155, 238, 238),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(16.0),
                   ),
-                  child: Row(
+                  child: const Row(
                     children: [
-                      const Icon(Iconsax.health,
-                          size: 32, color: AppColor.primaryColor),
-                      SizedBox(width: 16.w),
+                      Icon(Iconsax.health, size: 32, color: Colors.white),
+                      SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,15 +71,15 @@ class HomePage extends StatelessWidget {
                             Text(
                               "Start Diagnosis",
                               style: TextStyle(
-                                fontSize: 18.sp,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: AppColor.scandryColor,
+                                color: Colors.white,
                               ),
                             ),
                             Text(
                               "Click to diagnose your symptoms.",
                               style: TextStyle(
-                                  fontSize: 14.sp, color: Colors.grey[700]),
+                                  fontSize: 14, color: Colors.white70),
                             ),
                           ],
                         ),
@@ -84,7 +94,7 @@ class HomePage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColor.scandryColor,
+                  color: AppColor.secondaryColor,
                 ),
               ),
               SizedBox(height: 16.h),
@@ -101,7 +111,7 @@ class HomePage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
-                  color: AppColor.scandryColor,
+                  color: AppColor.secondaryColor,
                 ),
               ),
               SizedBox(height: 12.h),
@@ -127,7 +137,54 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 24.h),
-              const Supportbutton(),
+
+              // زر التمرين بعد التشخيص
+              GestureDetector(
+                onTap: () {
+                  if (onNavigate != null) {
+                    onNavigate!(2); // الانتقال إلى صفحة التمارين
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Colors.orange, Colors.deepOrange],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.fitness_center, size: 32, color: Colors.white),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Recommended Exercises",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              "Click to see exercises for your condition.",
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.h),
+              const CustomerSupportButton(),
             ],
           ),
         ),

@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
           ),
           themeMode: ThemeMode.system,
           onGenerateRoute: AppRouter.generateRoute,
-          initialRoute: Routes.splash,
+          initialRoute: Routes.homeScreen,
           builder: DevicePreview.appBuilder,
         ),
       ),

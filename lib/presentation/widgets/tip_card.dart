@@ -6,10 +6,10 @@ class TipCard extends StatelessWidget {
   final Color color;
 
   const TipCard({
-    Key? key,
+    super.key,
     required this.tip,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

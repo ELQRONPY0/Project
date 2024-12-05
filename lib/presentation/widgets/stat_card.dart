@@ -22,7 +22,7 @@ class StatCard extends StatelessWidget {
           children: [
             Text(
               title,
-              style: TextStyle(fontSize: 14.sp, color: AppColor.scandryColor),
+              style: TextStyle(fontSize: 14.sp, color: AppColor.secondaryColor),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 12.h),

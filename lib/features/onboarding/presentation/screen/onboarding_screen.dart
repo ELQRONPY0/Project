@@ -82,7 +82,7 @@ class _OnboardingState extends State<Onboarding> {
                           width: cubit.currentIndex == i ? 20 : 18,
                           decoration: BoxDecoration(
                             color: cubit.currentIndex == i
-                                ? AppColor.scandryColor
+                                ? AppColor.secondaryColor
                                 : AppColor.lightCyan,
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -97,7 +97,7 @@ class _OnboardingState extends State<Onboarding> {
                       style: TextStyle(
                         fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
-                        color: AppColor.scandryColor,
+                        color: AppColor.secondaryColor,
                       ),
                     ),
                     SizedBox(height: 16.h),
@@ -107,7 +107,7 @@ class _OnboardingState extends State<Onboarding> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16.sp,
-                        color: AppColor.scandryColor,
+                        color: AppColor.secondaryColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

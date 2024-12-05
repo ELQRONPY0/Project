@@ -1,17 +1,24 @@
-import 'package:ai_tumor_detect/core/constant/color.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
+import 'package:ai_tumor_detect/core/constant/color.dart';
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int currentIndex;
+  final bool isNotHome; // للتحكم في زر الرجوع
 
-  const CustomAppBar({Key? key, required this.currentIndex}) : super(key: key);
+  const CustomAppBar({
+    super.key,
+    required this.currentIndex, // معامل مطلوب
+    this.isNotHome = false, // قيمة افتراضية
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: _isNotHome(currentIndex), // إظهار زر الرجوع
       toolbarHeight: 80,
-      elevation: 0, // إزالة الظل لجعل التصميم أكثر أناقة
+      elevation: 0,
       backgroundColor: AppColor.primaryColor,
       flexibleSpace: Container(
         decoration: const BoxDecoration(
@@ -27,11 +34,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            _getAppBarIcon(currentIndex), // أيقونة ديناميكية حسب القسم
+            _getAppBarIcon(currentIndex),
             color: Colors.white,
             size: 28,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 18),
           Text(
             _getAppBarTitle(currentIndex),
             style: const TextStyle(
@@ -43,12 +50,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.search, color: Colors.white),
-          onPressed: () {
-            // Action for search
-          },
-        ),
         IconButton(
           icon: const Icon(Icons.settings, color: Colors.white),
           onPressed: () {
@@ -68,7 +69,7 @@ String _getAppBarTitle(int index) {
     case 0:
       return "Home";
     case 1:
-      return "Settings";
+      return "Diagnosis";
     case 2:
       return "Exercises";
     case 3:
@@ -90,5 +91,13 @@ IconData _getAppBarIcon(int index) {
       return Iconsax.heart_add;
     default:
       return Iconsax.menu;
+  }
+}
+
+bool _isNotHome(int index) {
+  if (index == 0) {
+    return false;
+  } else {
+    return true;
   }
 }

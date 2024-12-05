@@ -18,12 +18,26 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const DiagnosisPage(),
-    const ExercisesPage(),
-    const EffectsPage(),
-  ];
+  void _onNavigate(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  late List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      HomePage(
+        onNavigate: _onNavigate,
+      ),
+      const DiagnosisPage(),
+      const ExercisesPage(),
+      const EffectsPage(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,28 +45,39 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColor.white,
       appBar: CustomAppBar(
         currentIndex: _currentIndex,
+        isNotHome: false,
       ),
       body: _pages[_currentIndex],
       bottomNavigationBar: Container(
         height: 80,
-        color: AppColor.primaryColor,
-        child: GNav(
-          gap: 8,
-          onTabChange: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          selectedIndex: _currentIndex,
-          activeColor: Colors.white,
-          color: Colors.white70,
-          tabBackgroundColor: AppColor.lightCyan.withOpacity(0.2),
-          tabs: const [
-            GButton(icon: Iconsax.home, text: 'Home'),
-            GButton(icon: Iconsax.health, text: "Diagnosis"),
-            GButton(icon: Icons.fitness_center_outlined, text: "Exercises"),
-            GButton(icon: Iconsax.heart_add, text: "Effects"),
-          ],
+        decoration: const BoxDecoration(
+          color: AppColor.primaryColor,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+          child: GNav(
+            gap: 8,
+            onTabChange: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            selectedIndex: _currentIndex,
+            activeColor: Colors.white,
+            color: Colors.white70,
+            tabBackgroundColor: AppColor.lightCyan.withOpacity(0.2),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            tabs: const [
+              GButton(icon: Iconsax.home, text: 'Home'),
+              GButton(icon: Iconsax.health, text: "Diagnosis"),
+              GButton(icon: Icons.fitness_center_outlined, text: "Exercises"),
+              GButton(icon: Iconsax.heart_add, text: "Effects"),
+            ],
+          ),
         ),
       ),
     );
