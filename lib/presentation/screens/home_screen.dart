@@ -9,7 +9,9 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:iconsax/iconsax.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(int)? onNavigate; // وظيفة للتنقل بين الصفحات
+
+  const HomeScreen({super.key, this.onNavigate});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -26,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   late List<Widget> _pages;
 
+  get onNavigate => widget.onNavigate;
+
   @override
   void initState() {
     super.initState();
@@ -33,8 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
       HomePage(
         onNavigate: _onNavigate,
       ),
-      const DiagnosisPage(),
-      const ExercisesPage(),
+      DiagnosisPage(
+        onNavigate: _onNavigate,
+      ),
+      const ExercisesPage(
+        tumorType: "Breathing Exercise",
+      ),
       const EffectsPage(),
     ];
   }
@@ -45,7 +53,12 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColor.white,
       appBar: CustomAppBar(
         currentIndex: _currentIndex,
-        isNotHome: false,
+        // isNotHome: false,
+        onNavigate: (index) {
+          setState(() {
+            _currentIndex = 0; // تغيير الفهرس للتنقل إلى الصفحة المطلوبة
+          });
+        },
       ),
       body: _pages[_currentIndex],
       bottomNavigationBar: Container(

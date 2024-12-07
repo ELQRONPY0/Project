@@ -1,22 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax/iconsax.dart';
-
 import 'package:ai_tumor_detect/core/constant/color.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int currentIndex;
-  final bool isNotHome; // للتحكم في زر الرجوع
+  final Function(int)? onNavigate; // وظيفة للتنقل بين الصفحات
 
   const CustomAppBar({
     super.key,
     required this.currentIndex, // معامل مطلوب
-    this.isNotHome = false, // قيمة افتراضية
+    this.onNavigate,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      automaticallyImplyLeading: _isNotHome(currentIndex), // إظهار زر الرجوع
+      automaticallyImplyLeading: false,
+      leading: _isNotHome(currentIndex)
+          ? IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                if (onNavigate != null) {
+                  onNavigate!(0); // تغيير الفهرس إلى الصفحة الرئيسية (Home)
+                } else {
+                  Navigator.pop(context); // العودة للصفحة السابقة
+                }
+              },
+            )
+          : null,
       toolbarHeight: 80,
       elevation: 0,
       backgroundColor: AppColor.primaryColor,
@@ -41,9 +56,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(width: 18),
           Text(
             _getAppBarTitle(currentIndex),
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 20.h,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -95,9 +110,5 @@ IconData _getAppBarIcon(int index) {
 }
 
 bool _isNotHome(int index) {
-  if (index == 0) {
-    return false;
-  } else {
-    return true;
-  }
+  return index != 0; // زر الرجوع يظهر فقط إذا لم تكن في الصفحة الرئيسية
 }

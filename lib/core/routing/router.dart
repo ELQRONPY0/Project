@@ -24,13 +24,7 @@ class AppRouter {
         return MaterialPageRoute(builder: (context) => const DiagnosisPage());
 
       default:
-        return MaterialPageRoute(
-          builder: (context) => Scaffold(
-            body: Center(
-              child: Text("No route defined for ${settings.name}"),
-            ),
-          ),
-        );
+        return MaterialPageRoute(builder: (context) => const HomeScreen());
     }
   }
 }

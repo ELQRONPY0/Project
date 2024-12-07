@@ -91,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           'Forgot Password?',
                           style: TextStyle(
                             color: AppColor.primaryColor,
-                            fontSize: 16.sp,
+                            fontSize: 16.h,
                             fontFamily: GoogleFonts.aBeeZee().fontFamily,
                           ),
                         ),
@@ -126,20 +126,32 @@ class _LoginScreenState extends State<LoginScreen> {
                           } on FirebaseAuthException catch (e) {
                             if (e.code == 'user-not-found') {
                               showSnackBar(
-                                  context, 'No user found for that email.');
+                                context,
+                                'No user found for that email.',
+                                backgroundColor: Colors.red,
+                              );
                             } else if (e.code == 'wrong-password') {
-                              showSnackBar(context,
-                                  'Wrong password provided for that user.');
+                              showSnackBar(
+                                context,
+                                'Wrong password provided for that user.',
+                                backgroundColor: Colors.red,
+                              );
                             } else {
-                              showSnackBar(context,
-                                  'Authentication failed. Please try again.');
+                              showSnackBar(
+                                context,
+                                'Authentication failed. Please try again.',
+                                backgroundColor: Colors.red,
+                              );
                             }
                           }
                         }
                       } else {
                         // إذا كانت البيانات المحلية غير صحيحة
                         showSnackBar(
-                            context, 'Please enter valid email and password.');
+                          context,
+                          'Please enter valid email and password.',
+                          backgroundColor: Colors.red,
+                        );
                       }
                       setState(() {
                         isLoading = false;
@@ -156,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Or Continue with',
                       style: TextStyle(
                         color: const Color(0xFF51526c),
-                        fontSize: 16.sp,
+                        fontSize: 16.h,
                         fontFamily: GoogleFonts.itim().fontFamily,
                       ),
                     ),
@@ -175,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         'Don\'t have an account?',
                         style: TextStyle(
                           color: const Color(0xFF51526c),
-                          fontSize: 16.sp,
+                          fontSize: 16.h,
                           fontFamily: GoogleFonts.aBeeZee().fontFamily,
                         ),
                       ),
@@ -191,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ' Sign up',
                           style: TextStyle(
                             color: AppColor.primaryColor,
-                            fontSize: 16.sp,
+                            fontSize: 16.h,
                             fontFamily: GoogleFonts.aBeeZee().fontFamily,
                           ),
                         ),

@@ -71,17 +71,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
           password: password,
         );
 
-        showSnackBar(context, 'User signed up: ${user.user?.email}');
+        showSnackBar(
+          context,
+          'Registration has been completed successfully.',
+          backgroundColor: Colors.green,
+        );
         Navigator.pushReplacementNamed(context, '/homeScreen');
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
           showSnackBar(context, 'The password provided is too weak.');
         } else if (e.code == 'email-already-in-use') {
-          showSnackBar(context, 'The account already exists for that email.');
+          showSnackBar(
+            context,
+            'The account already exists for that email.',
+            backgroundColor: Colors.blue,
+          );
         }
       } catch (e) {
         print(e);
-        showSnackBar(context, 'An error occurred while signing up');
+        showSnackBar(
+          context,
+          'An error occurred while signing up',
+          backgroundColor: Colors.red,
+        );
       }
       setState(() {
         isLoading = false;

@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:ai_tumor_detect/core/constant/color.dart';
+import 'package:ai_tumor_detect/core/helper/show_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
 class DiagnosisPage extends StatefulWidget {
-  const DiagnosisPage({super.key});
+  final Function(int)? onNavigate; // وظيفة للتنقل بين الصفحات
+  const DiagnosisPage({super.key, this.onNavigate});
 
   @override
   State<DiagnosisPage> createState() => _DiagnosisPageState();
@@ -17,6 +20,8 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
   String? _diagnosisResult;
 
   final ImagePicker _picker = ImagePicker();
+
+  get onNavigate => widget.onNavigate;
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -30,8 +35,10 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
 
   Future<void> _startDiagnosis() async {
     if (_selectedImage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please upload an MRI scan first.")),
+      showSnackBar(
+        context,
+        "Please upload an MRI scan first.",
+        backgroundColor: Colors.orange,
       );
       return;
     }
@@ -208,6 +215,55 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
                   ),
                 ),
               ),
+            const SizedBox(height: 32),
+
+            // زر التمرين بعد التشخيص
+            if (_diagnosisResult != null)
+              GestureDetector(
+                onTap: () {
+                  if (onNavigate != null) {
+                    onNavigate(2); // الانتقال إلى صفحة التمارين
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Colors.orange, Colors.deepOrange],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.fitness_center, size: 32, color: Colors.white),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Recommended Exercises",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              "Click to see exercises for your condition.",
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            SizedBox(height: 24.h),
 
             const SizedBox(height: 20),
 
