@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const ExercisesPage(
         tumorType: "Breathing Exercise",
       ),
-      const EffectsPage(),
+      EffectsPage(),
     ];
   }
 
