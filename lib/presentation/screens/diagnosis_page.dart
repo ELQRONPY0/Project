@@ -86,8 +86,8 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
-                      Color(0xFF2196F3),
-                      Color(0xFF1976D2)
+                      AppColor.primaryColor,
+                      Color.fromARGB(255, 155, 238, 238),
                     ], // Blue gradient
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -158,7 +158,7 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
                   gradient: const LinearGradient(
                     colors: [
                       Color(0xFF4CAF50),
-                      Color(0xFF2E7D32)
+                      Color.fromARGB(255, 116, 221, 121)
                     ], // Green gradient
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -171,12 +171,24 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
                   width: double.infinity,
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          "Start Diagnosis",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Image(
+                                image: AssetImage("assets/images/x-rays.png"),
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            const Text(
+                              "Start Diagnosis",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ],
                         ),
                 ),
               ),
