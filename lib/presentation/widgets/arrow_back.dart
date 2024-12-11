@@ -13,6 +13,7 @@ class ArrowBack extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       clipBehavior: Clip.antiAlias,
       decoration: ShapeDecoration(
+        color: AppColor.primaryColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(40),
           side: const BorderSide(
@@ -25,7 +26,10 @@ class ArrowBack extends StatelessWidget {
         onTap: () {
           Navigator.of(context).pop();
         },
-        child: const Icon(Icons.arrow_back_ios),
+        child: const Icon(
+          Icons.arrow_back_ios,
+          color: AppColor.white,
+        ),
       ),
     );
   }

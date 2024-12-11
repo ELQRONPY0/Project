@@ -51,7 +51,7 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
     await Future.delayed(const Duration(seconds: 3));
     setState(() {
       _isLoading = false;
-      _diagnosisResult = "No tumor detected. (Example result)";
+      _diagnosisResult = "Astrocitoma";
     });
   }
 

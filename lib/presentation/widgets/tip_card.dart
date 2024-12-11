@@ -32,7 +32,7 @@ class TipCard extends StatelessWidget {
         tip,
         style: TextStyle(
           color: Colors.white,
-          fontSize: 14.sp,
+          fontSize: 13.sp,
           fontWeight: FontWeight.bold,
         ),
       ),

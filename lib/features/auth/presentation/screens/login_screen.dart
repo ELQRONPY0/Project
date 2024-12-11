@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, unused_local_variable
+
 import 'package:ai_tumor_detect/core/constant/color.dart';
 import 'package:ai_tumor_detect/core/helper/show_snack_bar.dart';
 import 'package:ai_tumor_detect/features/auth/presentation/widgets/custom_button.dart';
@@ -91,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           'Forgot Password?',
                           style: TextStyle(
                             color: AppColor.primaryColor,
-                            fontSize: 16.h,
+                            fontSize: 16.sp,
                             fontFamily: GoogleFonts.aBeeZee().fontFamily,
                           ),
                         ),
@@ -168,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Or Continue with',
                       style: TextStyle(
                         color: const Color(0xFF51526c),
-                        fontSize: 16.h,
+                        fontSize: 16.sp,
                         fontFamily: GoogleFonts.itim().fontFamily,
                       ),
                     ),
@@ -187,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         'Don\'t have an account?',
                         style: TextStyle(
                           color: const Color(0xFF51526c),
-                          fontSize: 16.h,
+                          fontSize: 12.sp,
                           fontFamily: GoogleFonts.aBeeZee().fontFamily,
                         ),
                       ),
@@ -203,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ' Sign up',
                           style: TextStyle(
                             color: AppColor.primaryColor,
-                            fontSize: 16.h,
+                            fontSize: 14.sp,
                             fontFamily: GoogleFonts.aBeeZee().fontFamily,
                           ),
                         ),

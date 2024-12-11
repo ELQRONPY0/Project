@@ -7,9 +7,10 @@ import 'package:ai_tumor_detect/presentation/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // استيراد مكتبة flutter_screenutil
 
 class HomeScreen extends StatefulWidget {
-  final Function(int)? onNavigate; // وظيفة للتنقل بين الصفحات
+  final Function(int)? onNavigate;
 
   const HomeScreen({super.key, this.onNavigate});
 
@@ -40,9 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       DiagnosisPage(
         onNavigate: _onNavigate,
       ),
-      const ExercisesPage(
-        tumorType: "Breathing Exercise",
-      ),
+      ExercisesPage(),
       EffectsPage(),
     ];
   }
@@ -53,27 +52,29 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColor.white,
       appBar: CustomAppBar(
         currentIndex: _currentIndex,
-        // isNotHome: false,
         onNavigate: (index) {
           setState(() {
-            _currentIndex = 0; // تغيير الفهرس للتنقل إلى الصفحة المطلوبة
+            _currentIndex = 0;
           });
         },
       ),
       body: _pages[_currentIndex],
       bottomNavigationBar: Container(
-        height: 80,
-        decoration: const BoxDecoration(
+        height: 80.h, // استخدام h من flutter_screenutil
+        decoration: BoxDecoration(
           color: AppColor.primaryColor,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft:
+                Radius.circular(20.r), // استخدام r للتأكد من أن القيمة مرنة
+            topRight: Radius.circular(20.r),
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+          padding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 10.h), // استخدام w و h من flutter_screenutil
           child: GNav(
-            gap: 8,
+            gap: 8.w,
             onTabChange: (index) {
               setState(() {
                 _currentIndex = index;
@@ -83,12 +84,25 @@ class _HomeScreenState extends State<HomeScreen> {
             activeColor: Colors.white,
             color: Colors.white70,
             tabBackgroundColor: AppColor.lightCyan.withOpacity(0.2),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: EdgeInsets.symmetric(
+                horizontal: 18.w, vertical: 10.h), // استخدام w و h هنا أيضًا
             tabs: const [
-              GButton(icon: Iconsax.home, text: 'Home'),
-              GButton(icon: Iconsax.health, text: "Diagnosis"),
-              GButton(icon: Icons.fitness_center_outlined, text: "Exercises"),
-              GButton(icon: Iconsax.heart_add, text: "Effects"),
+              GButton(
+                icon: Iconsax.home,
+                text: 'Home',
+              ),
+              GButton(
+                icon: Iconsax.health,
+                text: "Diagnosis",
+              ),
+              GButton(
+                icon: Icons.fitness_center_outlined,
+                text: "Exercises",
+              ),
+              GButton(
+                icon: Iconsax.heart_add,
+                text: "Effects",
+              ),
             ],
           ),
         ),

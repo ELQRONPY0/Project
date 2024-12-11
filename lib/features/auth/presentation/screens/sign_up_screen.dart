@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, unused_local_variable
+
 import 'package:ai_tumor_detect/core/constant/color.dart';
 import 'package:ai_tumor_detect/core/helper/app_regex.dart';
 import 'package:ai_tumor_detect/core/helper/show_snack_bar.dart';
@@ -46,58 +48,66 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _signUp() async {
-    if (formKey.currentState!.validate()) {
-      final name = nameController.text.trim();
-      final phone = phoneController.text.trim();
-      final email = emailController.text.trim();
-      final password = passwordController.text.trim();
-      final confirmPassword = confirmPasswordController.text.trim();
+    try {
+      if (formKey.currentState!.validate()) {
+        final name = nameController.text.trim();
+        final phone = phoneController.text.trim();
+        final email = emailController.text.trim();
+        final password = passwordController.text.trim();
+        final confirmPassword = confirmPasswordController.text.trim();
 
-      if (password != confirmPassword) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Passwords do not match!')),
-        );
-        return;
-      }
+        if (password != confirmPassword) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Passwords do not match!')),
+          );
+          return;
+        }
 
-      setState(() {
-        isLoading = true;
-      });
+        setState(() {
+          isLoading = true;
+        });
 
-      try {
-        var auth = FirebaseAuth.instance;
-        UserCredential user = await auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+        try {
+          var auth = FirebaseAuth.instance;
+          UserCredential user = await auth.createUserWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
 
-        showSnackBar(
-          context,
-          'Registration has been completed successfully.',
-          backgroundColor: Colors.green,
-        );
-        Navigator.pushReplacementNamed(context, '/homeScreen');
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          showSnackBar(context, 'The password provided is too weak.');
-        } else if (e.code == 'email-already-in-use') {
           showSnackBar(
             context,
-            'The account already exists for that email.',
-            backgroundColor: Colors.blue,
+            'Registration has been completed successfully.',
+            backgroundColor: Colors.green,
           );
+          Navigator.pushReplacementNamed(context, '/homeScreen');
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'weak-password') {
+            showSnackBar(context, 'The password provided is too weak.');
+          } else if (e.code == 'email-already-in-use') {
+            showSnackBar(
+              context,
+              'The account already exists for that email.',
+              backgroundColor: Colors.blue,
+            );
+          }
+        } catch (e) {
+          showSnackBar(
+            context,
+            'An error occurred while signing up',
+            backgroundColor: Colors.red,
+          );
+        } finally {
+          setState(() {
+            isLoading = false;
+          });
         }
-      } catch (e) {
-        print(e);
-        showSnackBar(
-          context,
-          'An error occurred while signing up',
-          backgroundColor: Colors.red,
-        );
       }
-      setState(() {
-        isLoading = false;
-      });
+    } catch (error) {
+      showSnackBar(
+        context,
+        'Unexpected error occurred during form validation.',
+        backgroundColor: Colors.red,
+      );
     }
   }
 
@@ -121,16 +131,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Row(
                     children: [
                       const ArrowBack(),
-                      SizedBox(width: 16.w),
+                      const Spacer(
+                        flex: 9,
+                      ),
                       Image.asset(
                         'assets/images/Signup.png',
                         width: 150.w,
                         height: 140.h,
                       ),
+                      const Spacer(
+                        flex: 11,
+                      ),
                     ],
                   ),
                   SizedBox(height: 14.h),
                   _buildLabel('Your Name'),
+                  const SizedBox(
+                    height: 6,
+                  ),
                   CustomTextField(
                     controller: nameController,
                     validator: (value) => value?.isEmpty == true
@@ -141,6 +159,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   SizedBox(height: 14.h),
                   _buildLabel('Phone Number'),
+                  const SizedBox(
+                    height: 6,
+                  ),
                   CustomTextField(
                     controller: phoneController,
                     validator: (value) => (value?.isEmpty == true ||
@@ -152,6 +173,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   SizedBox(height: 14.h),
                   _buildLabel('Email'),
+                  const SizedBox(
+                    height: 6,
+                  ),
                   CustomTextField(
                     controller: emailController,
                     validator: (value) => (value?.isEmpty == true ||
@@ -163,6 +187,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   SizedBox(height: 14.h),
                   _buildLabel('Password'),
+                  const SizedBox(
+                    height: 6,
+                  ),
                   CustomTextField(
                     controller: passwordController,
                     isObscureText: true,
@@ -175,6 +202,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   SizedBox(height: 14.h),
                   _buildLabel('Confirm Password'),
+                  const SizedBox(
+                    height: 6,
+                  ),
                   CustomTextField(
                     controller: confirmPasswordController,
                     isObscureText: true,
