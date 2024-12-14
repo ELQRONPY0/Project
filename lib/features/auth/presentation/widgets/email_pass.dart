@@ -77,8 +77,7 @@ class _EmailAndPassState extends State<EmailAndPass> {
             prefixIcon: Icon(Icons.email_outlined, size: 20.sp),
           ),
           SizedBox(height: 16.h),
-
-          // كلمة المرور
+// كلمة المرور
           CustomTextField(
             controller: passwordController,
             hintText: 'Password',
@@ -88,6 +87,17 @@ class _EmailAndPassState extends State<EmailAndPass> {
                     ? 'Please enter a valid password'
                     : null,
             prefixIcon: Icon(Icons.lock_outline, size: 20.sp),
+            suffixIcon: IconButton(
+              icon: Icon(
+                isPasswordObscureText ? Icons.visibility_off : Icons.visibility,
+                size: 20.sp,
+              ),
+              onPressed: () {
+                setState(() {
+                  isPasswordObscureText = !isPasswordObscureText;
+                });
+              },
+            ),
           ),
         ],
       ),

@@ -192,7 +192,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   CustomTextField(
                     controller: passwordController,
-                    isObscureText: true,
+                    isObscureText: true, // إخفاء النص للحقل
                     validator: (value) => (value?.isEmpty == true ||
                             !AppRegex.isPasswordValid(value!))
                         ? 'Please enter a valid password'
@@ -207,7 +207,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   CustomTextField(
                     controller: confirmPasswordController,
-                    isObscureText: true,
+                    isObscureText: true, // إخفاء النص للحقل
                     validator: (value) => value?.isEmpty == true
                         ? 'Please confirm your password'
                         : null,

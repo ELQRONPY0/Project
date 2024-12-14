@@ -14,7 +14,7 @@ class CustomTextField extends StatelessWidget {
     this.hintText,
     this.onSaved,
     this.onchange,
-    this.isObscureText,
+    this.isObscureText = false, // قيمة افتراضية
     this.suffixIcon,
     this.prefixIcon,
     this.backgroundColor,
@@ -31,7 +31,7 @@ class CustomTextField extends StatelessWidget {
   final String? hintText;
   final void Function(String?)? onSaved;
   final void Function(String)? onchange;
-  final bool? isObscureText;
+  final bool isObscureText; // جعلها إلزامية مع قيمة افتراضية
   final Widget? suffixIcon;
   final Widget? prefixIcon;
   final Color? backgroundColor;
@@ -44,6 +44,7 @@ class CustomTextField extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
 
     return TextFormField(
+      obscureText: isObscureText, // يتم استخدام الخاصية مباشرة
       controller: controller,
       onChanged: onchange,
       decoration: InputDecoration(

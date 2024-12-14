@@ -24,7 +24,16 @@ class AppRouter {
         return MaterialPageRoute(builder: (context) => const DiagnosisPage());
 
       default:
-        return MaterialPageRoute(builder: (context) => const HomeScreen());
+        return MaterialPageRoute(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: Text(
+                'Unknown Route: ${settings.name}',
+                style: const TextStyle(fontSize: 20, color: Colors.red),
+              ),
+            ),
+          ),
+        );
     }
   }
 }
