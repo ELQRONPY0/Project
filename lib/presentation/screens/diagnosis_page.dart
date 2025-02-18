@@ -1,13 +1,12 @@
-import 'dart:io';
-
 import 'package:ai_tumor_detect/core/constant/color.dart';
-import 'package:ai_tumor_detect/core/helper/show_snack_bar.dart';
+import 'package:ai_tumor_detect/core/network/tumor_detection_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class DiagnosisPage extends StatefulWidget {
-  final Function(int)? onNavigate; // وظيفة للتنقل بين الصفحات
+  final Function(int)? onNavigate;
   const DiagnosisPage({super.key, this.onNavigate});
 
   @override
@@ -20,12 +19,14 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
   String? _diagnosisResult;
 
   final ImagePicker _picker = ImagePicker();
+  final TumorDetectionModel _model = TumorDetectionModel();
 
   get onNavigate => widget.onNavigate;
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
+      print('Image path: ${pickedFile.path}'); // طباعة مسار الصورة
       setState(() {
         _selectedImage = File(pickedFile.path);
         _diagnosisResult = null;
@@ -47,12 +48,23 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
       _isLoading = true;
     });
 
-    // Simulate diagnosis process
-    await Future.delayed(const Duration(seconds: 3));
-    setState(() {
-      _isLoading = false;
-      _diagnosisResult = "Astrocitoma";
-    });
+    try {
+      final result = await _model.diagnose(_selectedImage!);
+      setState(() {
+        _isLoading = false;
+        _diagnosisResult = result;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error: $e'); // طباعة الخطأ في وحدة التحكم
+      showSnackBar(
+        context,
+        "Failed to diagnose: ${e.toString()}", // عرض تفاصيل الخطأ للمستخدم
+        backgroundColor: Colors.red,
+      );
+    }
   }
 
   @override
@@ -70,8 +82,6 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-
-            // Upload Button
             ElevatedButton(
               onPressed: _pickImage,
               style: ElevatedButton.styleFrom(
@@ -82,42 +92,39 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              child: Ink(
+              child: Container(
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
                       AppColor.primaryColor,
                       Color.fromARGB(255, 155, 238, 238),
-                    ], // Blue gradient
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 50,
-                  width: double.infinity,
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.upload, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text(
-                        "Upload MRI Scan",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                alignment: Alignment.center,
+                height: 50,
+                width: double.infinity,
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.upload, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      "Upload MRI Scan",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
             const SizedBox(height: 20),
-
-            // Display uploaded image
             if (_selectedImage != null)
               Card(
                 elevation: 4,
@@ -139,10 +146,7 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
                 "No image selected yet.",
                 style: TextStyle(color: Colors.grey, fontSize: 14),
               ),
-
             const SizedBox(height: 20),
-
-            // Start Diagnosis Button
             ElevatedButton(
               onPressed: _isLoading ? null : _startDiagnosis,
               style: ElevatedButton.styleFrom(
@@ -159,7 +163,7 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
                     colors: [
                       Color(0xFF4CAF50),
                       Color.fromARGB(255, 116, 221, 121)
-                    ], // Green gradient
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -194,8 +198,6 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Display Diagnosis Result
             if (_diagnosisResult != null)
               Card(
                 elevation: 4,
@@ -228,13 +230,11 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
                 ),
               ),
             const SizedBox(height: 32),
-
-            // زر التمرين بعد التشخيص
             if (_diagnosisResult != null)
               GestureDetector(
                 onTap: () {
                   if (onNavigate != null) {
-                    onNavigate(2); // الانتقال إلى صفحة التمارين
+                    onNavigate(2);
                   }
                 },
                 child: Container(
@@ -276,17 +276,36 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
                 ),
               ),
             SizedBox(height: 24.h),
-
             const SizedBox(height: 20),
-
-            // Retry Button
             if (_diagnosisResult != null || _selectedImage != null)
               ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    _selectedImage = null;
-                    _diagnosisResult = null;
-                  });
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Reset Diagnosis"),
+                      content: const Text(
+                          "Are you sure you want to reset the diagnosis?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedImage = null;
+                              _diagnosisResult = null;
+                            });
+                            Navigator.pop(context);
+                          },
+                          child: const Text("Reset"),
+                        ),
+                      ],
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
@@ -300,10 +319,7 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
                 child: Ink(
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFFFFA726),
-                        Color(0xFFF57C00)
-                      ], // Orange gradient
+                      colors: [Color(0xFFFFA726), Color(0xFFF57C00)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -335,4 +351,13 @@ class _DiagnosisPageState extends State<DiagnosisPage> {
       ),
     );
   }
+}
+
+void showSnackBar(BuildContext context, String message,
+    {Color backgroundColor = Colors.black}) {
+  final snackBar = SnackBar(
+    content: Text(message),
+    backgroundColor: backgroundColor,
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }

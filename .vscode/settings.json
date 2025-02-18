@@ -2,5 +2,6 @@
     "editor.tokenColorCustomizations": {
         "comments": "",
         "textMateRules": []
-    }
+    },
+    "CodeGPT.apiKey": "CodeGPT Plus Beta"
 }
