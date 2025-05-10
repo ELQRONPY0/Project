@@ -1,0 +1,2 @@
+C:/ai_tumor_detect/android/app/.cxx/Debug/tg6t2q1h/x86_64/CMakeFiles/edit_cache.dir
+C:/ai_tumor_detect/android/app/.cxx/Debug/tg6t2q1h/x86_64/CMakeFiles/rebuild_cache.dir

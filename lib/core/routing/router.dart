@@ -4,6 +4,7 @@ import 'package:ai_tumor_detect/features/auth/presentation/screens/sign_up_scree
 import 'package:ai_tumor_detect/presentation/screens/diagnosis_page.dart';
 import 'package:ai_tumor_detect/presentation/screens/home_screen.dart';
 import 'package:ai_tumor_detect/features/onboarding/presentation/screen/onboarding_screen.dart';
+import 'package:ai_tumor_detect/presentation/screens/settings_page.dart';
 import 'package:ai_tumor_detect/presentation/screens/splash.dart';
 import 'package:flutter/material.dart';
 
@@ -22,6 +23,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (context) => const HomeScreen());
       case Routes.diagnosisPage:
         return MaterialPageRoute(builder: (context) => const DiagnosisPage());
+      case Routes.settingsPage:
+        return MaterialPageRoute(builder: (context) => const SettingsPage());
 
       default:
         return MaterialPageRoute(

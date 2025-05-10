@@ -16,7 +16,7 @@ class _SplashState extends State<Splash> {
   }
 
   void _navigateToNextScreen() async {
-    await Future.delayed(const Duration(milliseconds: 4500));
+    await Future.delayed(const Duration(milliseconds: 450000));
     if (!mounted) return;
     Navigator.pushReplacementNamed(context, Routes.onBoarding);
   }

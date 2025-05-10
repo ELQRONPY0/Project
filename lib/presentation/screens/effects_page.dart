@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ai_tumor_detect/core/constant/color.dart';
 
 class EffectsPage extends StatelessWidget {
-  // قائمة الأورام مع الوصف والأجزاء المتأثرة
+  final String? tumorType;
   final List<Map<String, dynamic>> tumorEffects = [
     {
       'name': 'Meningioma',
@@ -157,127 +159,222 @@ class EffectsPage extends StatelessWidget {
     },
   ];
 
-  EffectsPage({super.key});
+  EffectsPage({super.key, this.tumorType});
 
   @override
   Widget build(BuildContext context) {
+    final filteredEffects = tumorType != null
+        ? tumorEffects.where((t) => t['name'] == tumorType).toList()
+        : tumorEffects;
+
     return Scaffold(
+      backgroundColor: AppColor.white,
+      appBar: tumorType != null
+          ? AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: Text(
+                "Effects of $tumorType",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              centerTitle: true,
+              flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColor.primaryColor, AppColor.lightCyan],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+            )
+          : null,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color.fromARGB(255, 255, 255, 255),
-              Color.fromARGB(255, 255, 255, 255),
+              Colors.white,
+              AppColor.lightCyan.withOpacity(0.1),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: ListView.builder(
-          padding: const EdgeInsets.all(20.0),
-          itemCount: tumorEffects.length,
+          padding: EdgeInsets.all(20.w),
+          itemCount: filteredEffects.length,
           itemBuilder: (context, index) {
-            final tumor = tumorEffects[index];
-            return Card(
-              elevation: 6,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: InkWell(
-                onTap: () {},
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.all(20.0),
-                  decoration: BoxDecoration(
-                    color: _getCardColor(index),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        tumor['name'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        tumor['description'],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(
-                        color: Colors.white70,
-                        thickness: 1.2,
-                      ),
-                      const SizedBox(height: 10),
-                      ...((tumor['details'] as List<dynamic>?) ?? []).map(
-                        (detail) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.circle,
-                                size: 10,
-                                color: Colors.white70,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      detail['part'],
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    if (detail['effect'] != null)
-                                      Text(
-                                        detail['effect'],
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.white70,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            final tumor = filteredEffects[index];
+            return _buildTumorCard(tumor, index);
           },
         ),
       ),
     );
   }
 
+  Widget _buildTumorCard(Map<String, dynamic> tumor, int index) {
+    return Card(
+      elevation: 8,
+      margin: EdgeInsets.symmetric(vertical: 12.h),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              _getCardColor(index),
+              _getCardColor(index).withOpacity(0.8),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: _getCardColor(index).withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  _getTumorIcon(tumor['name']),
+                  color: Colors.white,
+                  size: 24.r,
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Text(
+                    tumor['name'],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.sp,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              tumor['description'],
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.white.withOpacity(0.9),
+                height: 1.5,
+              ),
+            ),
+            SizedBox(height: 16.h),
+            const Divider(color: Colors.white70, thickness: 1.2),
+            SizedBox(height: 16.h),
+            ...(tumor['details'] as List<dynamic>).map(
+              (detail) => Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.circle,
+                      size: 8.r,
+                      color: Colors.white70,
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            detail['part'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.sp,
+                              color: Colors.white,
+                            ),
+                          ),
+                          if (detail['effect'] != null) ...[
+                            SizedBox(height: 4.h),
+                            Text(
+                              detail['effect'],
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: Colors.white.withOpacity(0.8),
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getTumorIcon(String tumorName) {
+    switch (tumorName) {
+      case 'Meningioma':
+        return Icons.circle;
+      case 'Astrocitoma':
+        return Icons.circle;
+      case 'Schwannoma':
+        return Icons.circle;
+      case 'Neurocitoma':
+        return Icons.circle;
+      case 'Carcinoma':
+        return Icons.circle;
+      case 'Papiloma':
+        return Icons.circle;
+      case 'Oligodendroglioma':
+        return Icons.circle;
+      case 'Glioblastoma':
+        return Icons.circle;
+      case 'Ependimoma':
+        return Icons.circle;
+      case 'Tuberculoma':
+        return Icons.circle;
+      case 'Meduloblastoma':
+        return Icons.circle;
+      case 'Germinoma':
+        return Icons.circle;
+      case 'Granuloma':
+        return Icons.circle;
+      case 'Ganglioglioma':
+        return Icons.circle;
+      default:
+        return Icons.circle;
+    }
+  }
+
   Color _getCardColor(int index) {
-    // ألوان الكروت مشابهة لصفحة "Medical Tips".
     const colors = [
-      Color(0xFF1ABC9C), // أخضر زاهي
-      Color(0xFF3498DB), // أزرق
-      Color(0xFFF39C12), // برتقالي
-      Color(0xFFE74C3C), // أحمر
-      Color(0xFF2ECC71), // أصفر
-      Color(0xFF9B59B6), // أزرق ما��ل
-      Color(0xFFFF5722), // أحمر ��امق
-      Color(0xFF34495E), // أبيض ��اهي
+      Color(0xFF1ABC9C),
+      Color(0xFF3498DB),
+      Color(0xFFF39C12),
+      Color(0xFFE74C3C),
+      Color(0xFF2ECC71),
+      Color(0xFF9B59B6),
+      Color(0xFFFF5722),
+      Color(0xFF34495E),
     ];
     return colors[index % colors.length];
   }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ai_tumor_detect/core/constant/color.dart';
 
 class ExercisesPage extends StatelessWidget {
-  // جميع التمارين مصنفة حسب نوع الورم
+  final String? tumorType;
   final Map<String, List<Map<String, String>>> tumorExercises = {
     'Meningioma': [
       {
@@ -146,118 +148,288 @@ class ExercisesPage extends StatelessWidget {
     ],
   };
 
-  ExercisesPage({super.key});
+  ExercisesPage({super.key, this.tumorType});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: tumorExercises.keys.length,
-        itemBuilder: (context, index) {
-          final tumorType = tumorExercises.keys.elementAt(index);
-          final exercises = tumorExercises[tumorType]!;
-          final cardColor = _getCardColor(index);
-          final textColor = _getTextColor(cardColor);
+    final exercisesList = tumorType != null
+        ? tumorExercises[tumorType] ?? []
+        : tumorExercises.entries.expand((e) => e.value).toList();
 
-          return Card(
-            elevation: 6,
-            margin: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: cardColor,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: const Color(0xFFD1D9E6),
-                  width: 1.5,
+    return Scaffold(
+      backgroundColor: AppColor.white,
+      appBar: tumorType != null
+          ? AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: Text(
+                "Exercises for $tumorType",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    tumorType,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                      color: textColor,
-                    ),
+              centerTitle: true,
+              flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColor.primaryColor, AppColor.lightCyan],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  const Divider(
-                    height: 20,
-                    thickness: 1.5,
-                    color: Color(0xFFE2E8F0),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: exercises.map((exercise) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.fitness_center,
-                              size: 20,
-                              color: textColor,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    exercise['name']!,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                      color: textColor,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    exercise['description']!,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: textColor.withOpacity(0.8),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
+                ),
               ),
-            ),
-          );
-        },
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+            )
+          : null,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.white,
+              AppColor.lightCyan.withOpacity(0.1),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: ListView.builder(
+          padding: EdgeInsets.all(20.w),
+          itemCount: tumorType != null
+              ? exercisesList.length
+              : tumorExercises.keys.length,
+          itemBuilder: (context, index) {
+            if (tumorType != null) {
+              return _buildExerciseCard(exercisesList[index], index);
+            } else {
+              final tumorType = tumorExercises.keys.elementAt(index);
+              return _buildTumorSection(tumorType, index);
+            }
+          },
+        ),
       ),
     );
   }
 
-  Color _getCardColor(int index) {
-    const colors = [
-      Color(0xFF1ABC9C), // أخضر زاهي
-      Color(0xFF3498DB), // أزرق
-      Color(0xFFF39C12), // برتقالي
-      Color(0xFFE74C3C), // أحمر
-      Color(0xFF2ECC71), // أصفر
-      Color(0xFF9B59B6), // أزرق مائل
-      Color(0xFFFF5722), // أحمر غامق
-      Color(0xFF34495E), // أبيض باهي
-    ];
-    return colors[index % colors.length];
+  Widget _buildTumorSection(String tumorType, int index) {
+    final exercises = tumorExercises[tumorType]!;
+    final cardColor = _getCardColor(index);
+
+    return Card(
+      elevation: 8,
+      margin: EdgeInsets.symmetric(vertical: 12.h),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              cardColor,
+              cardColor.withOpacity(0.8),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: cardColor.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  _getTumorIcon(tumorType),
+                  color: Colors.white,
+                  size: 24.r,
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Text(
+                    tumorType,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.sp,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            const Divider(color: Colors.white70, thickness: 1.2),
+            SizedBox(height: 16.h),
+            ...exercises.map(
+              (exercise) => Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.fitness_center,
+                      size: 20.r,
+                      color: Colors.white70,
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            exercise['name']!,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.sp,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            exercise['description']!,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.white.withOpacity(0.8),
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  Color _getTextColor(Color backgroundColor) {
-    // إذا كانت الخلفية داكنة نختار لون خط فاتح، والعكس صحيح.
-    final brightness = backgroundColor.computeLuminance();
-    return brightness > 0.5 ? Colors.black : Colors.white;
+  Widget _buildExerciseCard(Map<String, String> exercise, int index) {
+    final cardColor = _getCardColor(index);
+
+    return Card(
+      elevation: 8,
+      margin: EdgeInsets.symmetric(vertical: 12.h),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              cardColor,
+              cardColor.withOpacity(0.8),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: cardColor.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.fitness_center,
+                  color: Colors.white,
+                  size: 24.r,
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Text(
+                    exercise['name']!,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.sp,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              exercise['description']!,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.white.withOpacity(0.9),
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getTumorIcon(String tumorName) {
+    switch (tumorName) {
+      case 'Meningioma':
+        return Icons.circle;
+      case 'Astrocitoma':
+        return Icons.circle;
+      case 'Schwannoma':
+        return Icons.circle;
+      case 'Neurocitoma':
+        return Icons.circle;
+      case 'Carcinoma':
+        return Icons.circle;
+      case 'Papiloma':
+        return Icons.circle;
+      case 'Oligodendroglioma':
+        return Icons.circle;
+      case 'Glioblastoma':
+        return Icons.circle;
+      case 'Ependimoma':
+        return Icons.circle;
+      case 'Tuberculoma':
+        return Icons.air;
+      case 'Meduloblastoma':
+        return Icons.circle;
+      case 'Germinoma':
+        return Icons.circle;
+      case 'Granuloma':
+        return Icons.circle;
+      case 'Ganglioglioma':
+        return Icons.circle;
+      default:
+        return Icons.circle;
+    }
+  }
+
+  Color _getCardColor(int index) {
+    const colors = [
+      Color(0xFF1ABC9C),
+      Color(0xFF3498DB),
+      Color(0xFFF39C12),
+      Color(0xFFE74C3C),
+      Color(0xFF2ECC71),
+      Color(0xFF9B59B6),
+      Color(0xFFFF5722),
+      Color(0xFF34495E),
+    ];
+    return colors[index % colors.length];
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:ai_tumor_detect/core/constant/color.dart';
+import 'package:ai_tumor_detect/core/constant/string.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int currentIndex;
@@ -20,8 +21,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: _isNotHome(currentIndex)
           ? IconButton(
               icon: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
+                Icons.arrow_back_ios_new,
+                color: AppColor.white,
+                size: 24,
               ),
               onPressed: () {
                 if (onNavigate != null) {
@@ -68,7 +70,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.settings, color: Colors.white),
           onPressed: () {
-            // Action for settings
+            // Navigate to settings page
+            Navigator.pushNamed(
+                context, Routes.settingsPage); // تأكد من أن لديك صفحة إعدادات
           },
         ),
       ],

@@ -157,20 +157,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     hintText: 'Your Name',
                     prefixIcon: const Icon(Icons.person),
                   ),
-                  SizedBox(height: 14.h),
-                  _buildLabel('Phone Number'),
-                  const SizedBox(
-                    height: 6,
-                  ),
-                  CustomTextField(
-                    controller: phoneController,
-                    validator: (value) => (value?.isEmpty == true ||
-                            !AppRegex.isPhoneNumberValid(value!))
-                        ? 'Please enter a valid phone number'
-                        : null,
-                    hintText: 'Enter Phone Number',
-                    prefixIcon: const Icon(Icons.phone),
-                  ),
+                  // SizedBox(height: 14.h),
+                  // _buildLabel('Phone Number'),
+                  // const SizedBox(
+                  //   height: 6,
+                  // ),
+                  // CustomTextField(
+                  //   controller: phoneController,
+                  //   validator: (value) => (value?.isEmpty == true ||
+                  //           !AppRegex.isPhoneNumberValid(value!))
+                  //       ? 'Please enter a valid phone number'
+                  //       : null,
+                  //   hintText: 'Enter Phone Number',
+                  //   prefixIcon: const Icon(Icons.phone),
+                  // ),
                   SizedBox(height: 14.h),
                   _buildLabel('Email'),
                   const SizedBox(
