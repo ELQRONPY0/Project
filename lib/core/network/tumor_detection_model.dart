@@ -3,7 +3,7 @@ import 'dart:io';
 
 class TumorDetectionModel {
   final Dio _dio = Dio();
-  final String apiUrl = "http://10.0.2.2:8000/predict";
+  final String apiUrl = "http://192.168.1.3:8000/predict";
 
   Future<String> diagnose(File image) async {
     try {

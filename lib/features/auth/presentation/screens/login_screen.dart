@@ -2,11 +2,11 @@
 
 import 'package:ai_tumor_detect/core/constant/color.dart';
 import 'package:ai_tumor_detect/core/helper/show_snack_bar.dart';
+import 'package:ai_tumor_detect/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:ai_tumor_detect/features/auth/presentation/widgets/custom_button.dart';
 import 'package:ai_tumor_detect/features/auth/presentation/widgets/custom_other_login.dart';
 import 'package:ai_tumor_detect/features/auth/presentation/widgets/email_pass.dart';
 import 'package:ai_tumor_detect/features/auth/presentation/screens/sign_up_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? password;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  final AuthRepositoryImpl _authRepository = AuthRepositoryImpl();
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +107,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   CustomButton(
                     text: 'Log in',
                     onPressed: () async {
-                      // التحقق من صحة البيانات المحلية أولاً
                       final isValid = formKey.currentState?.validate() ?? false;
 
                       if (isValid) {
@@ -114,41 +114,32 @@ class _LoginScreenState extends State<LoginScreen> {
                           setState(() {
                             isLoading = true;
                           });
-                          try {
-                            var auth = FirebaseAuth.instance;
-                            UserCredential user =
-                                await auth.signInWithEmailAndPassword(
-                              email: email!,
-                              password: password!,
-                            );
 
-                            // تسجيل الدخول ناجح -> الانتقال إلى الصفحة الرئيسية
-                            Navigator.pushReplacementNamed(
-                                context, '/homeScreen');
-                          } on FirebaseAuthException catch (e) {
-                            if (e.code == 'user-not-found') {
+                          final result = await _authRepository.login(
+                            email: email!,
+                            password: password!,
+                          );
+
+                          result.fold(
+                            (error) {
                               showSnackBar(
                                 context,
-                                'No user found for that email.',
+                                error.toString(),
                                 backgroundColor: Colors.red,
                               );
-                            } else if (e.code == 'wrong-password') {
+                            },
+                            (user) {
                               showSnackBar(
                                 context,
-                                'Wrong password provided for that user.',
-                                backgroundColor: Colors.red,
+                                'You have successfully logged in.',
+                                backgroundColor: Colors.green,
                               );
-                            } else {
-                              showSnackBar(
-                                context,
-                                'Authentication failed. Please try again.',
-                                backgroundColor: Colors.red,
-                              );
-                            }
-                          }
+                              Navigator.pushReplacementNamed(
+                                  context, '/homeScreen');
+                            },
+                          );
                         }
                       } else {
-                        // إذا كانت البيانات المحلية غير صحيحة
                         showSnackBar(
                           context,
                           'Please enter valid email and password.',

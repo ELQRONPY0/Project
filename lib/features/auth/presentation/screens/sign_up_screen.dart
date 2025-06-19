@@ -3,11 +3,11 @@
 import 'package:ai_tumor_detect/core/constant/color.dart';
 import 'package:ai_tumor_detect/core/helper/app_regex.dart';
 import 'package:ai_tumor_detect/core/helper/show_snack_bar.dart';
+import 'package:ai_tumor_detect/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:ai_tumor_detect/presentation/widgets/arrow_back.dart';
 import 'package:ai_tumor_detect/features/auth/presentation/widgets/custom_button.dart';
 import 'package:ai_tumor_detect/features/auth/presentation/widgets/custom_text_field.dart';
 import 'package:ai_tumor_detect/features/auth/presentation/widgets/custom_other_login.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,6 +26,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   late TextEditingController emailController;
   late TextEditingController passwordController;
   late TextEditingController confirmPasswordController;
+  final AuthRepositoryImpl _authRepository = AuthRepositoryImpl();
 
   @override
   void initState() {
@@ -51,14 +52,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       if (formKey.currentState!.validate()) {
         final name = nameController.text.trim();
-        final phone = phoneController.text.trim();
         final email = emailController.text.trim();
         final password = passwordController.text.trim();
         final confirmPassword = confirmPasswordController.text.trim();
 
         if (password != confirmPassword) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Passwords do not match!')),
+          showSnackBar(
+            context,
+            'Passwords do not match!',
+            backgroundColor: Colors.red,
           );
           return;
         }
@@ -67,47 +69,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
           isLoading = true;
         });
 
-        try {
-          var auth = FirebaseAuth.instance;
-          UserCredential user = await auth.createUserWithEmailAndPassword(
-            email: email,
-            password: password,
-          );
+        final result = await _authRepository.signup(
+          email: email,
+          password: password,
+          name: name,
+        );
 
-          showSnackBar(
-            context,
-            'Registration has been completed successfully.',
-            backgroundColor: Colors.green,
-          );
-          Navigator.pushReplacementNamed(context, '/homeScreen');
-        } on FirebaseAuthException catch (e) {
-          if (e.code == 'weak-password') {
-            showSnackBar(context, 'The password provided is too weak.');
-          } else if (e.code == 'email-already-in-use') {
+        result.fold(
+          (error) {
             showSnackBar(
               context,
-              'The account already exists for that email.',
-              backgroundColor: Colors.blue,
+              error.toString(),
+              backgroundColor: Colors.red,
             );
-          }
-        } catch (e) {
-          showSnackBar(
-            context,
-            'An error occurred while signing up',
-            backgroundColor: Colors.red,
-          );
-        } finally {
-          setState(() {
-            isLoading = false;
-          });
-        }
+          },
+          (user) {
+            showSnackBar(
+              context,
+              'Registration successful',
+              backgroundColor: Colors.green,
+            );
+            Navigator.pushReplacementNamed(context, '/homeScreen');
+          },
+        );
+
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (error) {
       showSnackBar(
         context,
-        'Unexpected error occurred during form validation.',
+        'An unexpected error occurred',
         backgroundColor: Colors.red,
       );
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -157,20 +155,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     hintText: 'Your Name',
                     prefixIcon: const Icon(Icons.person),
                   ),
-                  // SizedBox(height: 14.h),
-                  // _buildLabel('Phone Number'),
-                  // const SizedBox(
-                  //   height: 6,
-                  // ),
-                  // CustomTextField(
-                  //   controller: phoneController,
-                  //   validator: (value) => (value?.isEmpty == true ||
-                  //           !AppRegex.isPhoneNumberValid(value!))
-                  //       ? 'Please enter a valid phone number'
-                  //       : null,
-                  //   hintText: 'Enter Phone Number',
-                  //   prefixIcon: const Icon(Icons.phone),
-                  // ),
                   SizedBox(height: 14.h),
                   _buildLabel('Email'),
                   const SizedBox(
@@ -192,7 +176,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   CustomTextField(
                     controller: passwordController,
-                    isObscureText: true, // إخفاء النص للحقل
+                    isObscureText: true,
                     validator: (value) => (value?.isEmpty == true ||
                             !AppRegex.isPasswordValid(value!))
                         ? 'Please enter a valid password'
@@ -207,7 +191,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   CustomTextField(
                     controller: confirmPasswordController,
-                    isObscureText: true, // إخفاء النص للحقل
+                    isObscureText: true,
                     validator: (value) => value?.isEmpty == true
                         ? 'Please confirm your password'
                         : null,
