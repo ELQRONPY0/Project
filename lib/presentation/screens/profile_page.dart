@@ -3,6 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ai_tumor_detect/core/constant/color.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:provider/provider.dart';
+import '../../features/auth/presentation/user_provider.dart';
+import 'package:ai_tumor_detect/presentation/screens/profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -23,7 +26,9 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    // Populate controllers once when the widget is initialized.
+    // The Consumer will handle subsequent updates.
+    _populateControllersFromProvider();
   }
 
   @override
@@ -35,21 +40,26 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   }
 
-  Future<void> _loadUserData() async {
-    // TODO: Load user data from API or local storage
-    setState(() {
-      _nameController.text = 'User Name';
-      _emailController.text = 'user@example.com';
-      _phoneController.text = '+1234567890';
-      _bioController.text =
-          'Medical professional with expertise in tumor detection and analysis.';
-    });
+  void _populateControllersFromProvider() {
+    // Use listen: false because we are in initState or a callback.
+    // The UI is rebuilt by the Consumer/Provider.of(context) in the build method.
+    final user = Provider.of<UserProvider>(context, listen: false).user;
+    if (user != null) {
+      _nameController.text = user.name ?? '';
+      _emailController.text = user.email ?? '';
+      _phoneController.text = user.phone ?? '';
+      _bioController.text = user.bio ?? '';
+      if (user.profileImage != null && File(user.profileImage!).existsSync()) {
+        _profileImage = File(user.profileImage!);
+      } else {
+        _profileImage = null;
+      }
+    }
   }
 
   Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       setState(() {
         _profileImage = File(image.path);
@@ -61,15 +71,22 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _isEditing = !_isEditing;
       if (!_isEditing) {
-        // Reset form if canceling edit
-        _loadUserData();
+        // If canceling edit, revert changes by re-populating from the provider.
+        _populateControllersFromProvider();
       }
     });
   }
 
   void _saveProfile() {
     if (_formKey.currentState!.validate()) {
-      // TODO: Save profile data to API or local storage
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.updateUser(
+        name: _nameController.text,
+        email: _emailController.text,
+        phone: _phoneController.text,
+        bio: _bioController.text,
+        profileImage: _profileImage?.path,
+      );
       setState(() {
         _isEditing = false;
       });
@@ -81,61 +98,69 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F8FA),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: AppColor.white,
-            size: 24,
+    // Using a Consumer to rebuild the UI when user data changes (e.g., on logout/login).
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        final user = userProvider.user;
+
+        // This check ensures that if we land on this page logged out, we see an appropriate UI.
+        if (user == null) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Profile')),
+            body: const Center(
+              child: Text('Please log in to view your profile.'),
+            ),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFF6F8FA),
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, color: AppColor.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: const Text('Profile',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold)),
+            centerTitle: true,
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColor.primaryColor, AppColor.lightCyan],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+            ),
+            elevation: 0,
+            actions: [
+              IconButton(
+                icon: Icon(_isEditing ? Icons.close : Icons.edit,
+                    color: Colors.white),
+                onPressed: _toggleEditMode,
+              ),
+            ],
           ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColor.primaryColor, AppColor.lightCyan],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                _buildProfileHeader(user),
+                SizedBox(height: 24.h),
+                _buildProfileForm(),
+                _buildLogoutButton(context)
+              ],
             ),
           ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(
-              _isEditing ? Icons.close : Icons.edit,
-              color: Colors.white,
-            ),
-            onPressed: _toggleEditMode,
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            _buildProfileHeader(),
-            SizedBox(height: 24.h),
-            _buildProfileForm(),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(user) {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -155,10 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 height: 120.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 4.w,
-                  ),
+                  border: Border.all(color: Colors.white, width: 4.w),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
@@ -170,18 +192,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(60.r),
                   child: _profileImage != null
-                      ? Image.file(
-                          _profileImage!,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          color: Colors.white,
-                          child: Icon(
-                            Icons.person,
-                            size: 60.r,
-                            color: AppColor.primaryColor,
-                          ),
-                        ),
+                      ? Image.file(_profileImage!, fit: BoxFit.cover)
+                      : (user?.profileImage != null
+                          ? Image.network(user!.profileImage!,
+                              fit: BoxFit.cover)
+                          : Container(
+                              color: Colors.white,
+                              child: Icon(Icons.person,
+                                  size: 60.r, color: AppColor.primaryColor),
+                            )),
                 ),
               ),
               if (_isEditing)
@@ -193,18 +212,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     decoration: BoxDecoration(
                       color: AppColor.primaryColor,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 2.w,
-                      ),
+                      border: Border.all(color: Colors.white, width: 2.w),
                     ),
                     child: InkWell(
                       onTap: _pickImage,
-                      child: Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: 20.r,
-                      ),
+                      child: Icon(Icons.camera_alt,
+                          color: Colors.white, size: 20.r),
                     ),
                   ),
                 ),
@@ -214,18 +227,15 @@ class _ProfilePageState extends State<ProfilePage> {
           Text(
             _nameController.text,
             style: TextStyle(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+                fontSize: 24.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
           ),
           SizedBox(height: 4.h),
           Text(
             _emailController.text,
             style: TextStyle(
-              fontSize: 16.sp,
-              color: Colors.white.withOpacity(0.8),
-            ),
+                fontSize: 16.sp, color: Colors.white.withOpacity(0.8)),
           ),
           SizedBox(height: 20.h),
         ],
@@ -245,109 +255,64 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 16.h),
             _buildFormCard([
               _buildTextField(
-                controller: _nameController,
-                label: 'Full Name',
-                icon: Icons.person_outline,
-                enabled: _isEditing,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
-              ),
+                  controller: _nameController,
+                  label: 'Full Name',
+                  icon: Icons.person_outline,
+                  enabled: _isEditing,
+                  validator: (val) =>
+                      val == null || val.isEmpty ? 'Enter your name' : null),
               _buildTextField(
-                controller: _emailController,
-                label: 'Email',
-                icon: Icons.email_outlined,
-                enabled: _isEditing,
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  if (!value.contains('@')) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
-              ),
+                  controller: _emailController,
+                  label: 'Email',
+                  icon: Icons.email_outlined,
+                  enabled: _isEditing,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (val) => val == null || !val.contains('@')
+                      ? 'Enter valid email'
+                      : null),
               _buildTextField(
-                controller: _phoneController,
-                label: 'Phone Number',
-                icon: Icons.phone_outlined,
-                enabled: _isEditing,
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your phone number';
-                  }
-                  return null;
-                },
-              ),
+                  controller: _phoneController,
+                  label: 'Phone Number',
+                  icon: Icons.phone_outlined,
+                  enabled: _isEditing,
+                  keyboardType: TextInputType.phone,
+                  validator: (val) =>
+                      val == null || val.isEmpty ? 'Enter phone number' : null),
             ]),
             SizedBox(height: 24.h),
             _buildSectionTitle('About'),
             SizedBox(height: 16.h),
             _buildFormCard([
               _buildTextField(
-                controller: _bioController,
-                label: 'Bio',
-                icon: Icons.description_outlined,
-                enabled: _isEditing,
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your bio';
-                  }
-                  return null;
-                },
-              ),
+                  controller: _bioController,
+                  label: 'Bio',
+                  icon: Icons.description_outlined,
+                  enabled: _isEditing,
+                  maxLines: 3,
+                  validator: (val) =>
+                      val == null || val.isEmpty ? 'Enter your bio' : null),
             ]),
-            SizedBox(height: 24.h),
-            _buildSectionTitle('Professional Information'),
-            SizedBox(height: 16.h),
-            _buildFormCard([
-              _buildInfoRow(
-                icon: Icons.work_outline,
-                title: 'Specialization',
-                value: 'Medical Imaging',
-              ),
-              _buildInfoRow(
-                icon: Icons.school_outlined,
-                title: 'Experience',
-                value: '5 years',
-              ),
-              _buildInfoRow(
-                icon: Icons.location_on_outlined,
-                title: 'Location',
-                value: 'New York, USA',
-              ),
-            ]),
-            if (_isEditing) ...[
-              SizedBox(height: 24.h),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saveProfile,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.primaryColor,
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+            if (_isEditing)
+              Padding(
+                padding: EdgeInsets.only(top: 24.h),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _saveProfile,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColor.primaryColor,
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r)),
                     ),
-                  ),
-                  child: Text(
-                    'Save Changes',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                    child: Text('Save Changes',
+                        style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white)),
                   ),
                 ),
               ),
-            ],
             SizedBox(height: 32.h),
           ],
         ),
@@ -361,10 +326,9 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 18.sp,
-          fontWeight: FontWeight.bold,
-          color: AppColor.primaryColor,
-        ),
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+            color: AppColor.primaryColor),
       ),
     );
   }
@@ -376,10 +340,9 @@ class _ProfilePageState extends State<ProfilePage> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -390,12 +353,11 @@ class _ProfilePageState extends State<ProfilePage> {
               child,
               if (index != children.length - 1)
                 Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Colors.grey.withOpacity(0.1),
-                  indent: 16.w,
-                  endIndent: 16.w,
-                ),
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey.withOpacity(0.1),
+                    indent: 16.w,
+                    endIndent: 16.w),
             ],
           );
         }).toList(),
@@ -420,21 +382,11 @@ class _ProfilePageState extends State<ProfilePage> {
         keyboardType: keyboardType,
         maxLines: maxLines ?? 1,
         validator: validator,
-        style: TextStyle(
-          fontSize: 16.sp,
-          color: Colors.black87,
-        ),
+        style: TextStyle(fontSize: 16.sp, color: Colors.black87),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(
-            fontSize: 14.sp,
-            color: Colors.black54,
-          ),
-          prefixIcon: Icon(
-            icon,
-            color: AppColor.primaryColor,
-            size: 24.r,
-          ),
+          labelStyle: TextStyle(fontSize: 14.sp, color: Colors.black54),
+          prefixIcon: Icon(icon, color: AppColor.primaryColor, size: 24.r),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(vertical: 12.h),
         ),
@@ -442,45 +394,34 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildInfoRow({
-    required IconData icon,
-    required String title,
-    required String value,
-  }) {
+  Widget _buildLogoutButton(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: AppColor.primaryColor,
-            size: 24.r,
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.black54,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: () async {
+            final userProvider =
+                Provider.of<UserProvider>(context, listen: false);
+            await userProvider.clearUser();
+            // TODO: Navigate to login screen
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil('/login', (route) => false);
+          },
+          icon: const Icon(Icons.logout, color: Colors.white),
+          label: const Text('Logout',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.redAccent,
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

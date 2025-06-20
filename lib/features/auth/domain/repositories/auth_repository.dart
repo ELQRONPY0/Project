@@ -16,4 +16,6 @@ abstract class AuthRepository {
   Future<Either<Exception, void>> logout();
 
   Future<Either<Exception, UserModel?>> getCurrentUser();
+
+  Future<void> initPrefs();
 }

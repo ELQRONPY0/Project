@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart';
+import '../../features/auth/presentation/user_provider.dart';
 
 class HomePage extends StatelessWidget {
   final Function(int)? onNavigate; // وظيفة للتنقل بين الصفحات
@@ -14,6 +16,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final user = userProvider.user;
     return Scaffold(
       backgroundColor: AppColor.white,
       body: SafeArea(
@@ -24,13 +28,16 @@ class HomePage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 30,
-                    backgroundImage: AssetImage('assets/images/logo.gif'),
+                    backgroundImage: user?.profileImage != null
+                        ? NetworkImage(user!.profileImage!)
+                        : const AssetImage('assets/images/logo.png')
+                            as ImageProvider,
                   ),
                   SizedBox(width: 12.w),
                   Text(
-                    "Welcome, User!",
+                    "Welcome ${user?.name ?? "User"}!",
                     style: TextStyle(
                       color: AppColor.secondaryColor,
                       fontSize: 20.sp,

@@ -4,6 +4,8 @@ import 'package:ai_tumor_detect/core/constant/color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ai_tumor_detect/presentation/screens/profile_page.dart';
+import 'package:provider/provider.dart';
+import '../../features/auth/presentation/user_provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -190,67 +192,77 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildUserProfile() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColor.primaryColor, AppColor.lightCyan],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: AppColor.primaryColor.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 30.r,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.person,
-              size: 40.r,
-              color: AppColor.primaryColor,
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        final user = userProvider.user;
+        return Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColor.primaryColor, AppColor.lightCyan],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: [
+              BoxShadow(
+                color: AppColor.primaryColor.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'User Name',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 30.r,
+                backgroundColor: Colors.white,
+                backgroundImage: user?.profileImage != null
+                    ? NetworkImage(user!.profileImage!)
+                    : null,
+                child: user?.profileImage == null
+                    ? Icon(
+                        Icons.person,
+                        size: 40.r,
+                        color: AppColor.primaryColor,
+                      )
+                    : null,
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user?.name ?? 'User Name',
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      user?.email ?? 'user@example.com',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  'user@example.com',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.white.withOpacity(0.8),
-                  ),
+              ),
+              IconButton(
+                onPressed: () => _navigateToProfile(),
+                icon: const Icon(
+                  Icons.edit,
+                  color: Colors.white,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: () => _navigateToProfile(),
-            icon: const Icon(
-              Icons.edit,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -368,9 +380,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void _navigateToProfile() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const ProfilePage(),
-      ),
+      MaterialPageRoute(builder: (context) => const ProfilePage()),
     );
   }
 
@@ -463,9 +473,17 @@ class _SettingsPageState extends State<SettingsPage> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              // TODO: Implement logout functionality
-              Navigator.pop(context);
+            onPressed: () async {
+              // Use the UserProvider to clear the user state and data
+              final userProvider =
+                  Provider.of<UserProvider>(context, listen: false);
+              await userProvider.clearUser();
+
+              // Navigate to login screen and remove all previous routes
+              if (mounted) {
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/login', (route) => false);
+              }
             },
             child: const Text(
               'Logout',

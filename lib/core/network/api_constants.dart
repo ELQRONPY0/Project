@@ -21,13 +21,14 @@ class ApiErrors {
 
 class ApiConstants {
   // Base URL
-  static const String baseUrl = "https://your-api-base-url.com/api";
+  static const String baseUrl = "http://192.168.1.59:8000/api";
 
   // Auth Endpoints
   static const String login = "/auth/login";
   static const String register = "/auth/register";
   static const String logout = "/auth/logout";
   static const String refreshToken = "/auth/refresh-token";
+  static const String userProfile = "/auth/user-profile";
 
   // User Endpoints
   static const String profile = "/user/profile";

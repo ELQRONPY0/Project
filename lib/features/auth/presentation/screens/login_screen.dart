@@ -11,6 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:provider/provider.dart';
+import 'package:ai_tumor_detect/features/auth/presentation/user_provider.dart';
+import 'package:ai_tumor_detect/features/auth/domain/repositories/auth_repository.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,7 +27,6 @@ class _LoginScreenState extends State<LoginScreen> {
   String? password;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool isLoading = false;
-  final AuthRepositoryImpl _authRepository = AuthRepositoryImpl();
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +117,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             isLoading = true;
                           });
 
-                          final result = await _authRepository.login(
+                          final authRepository = Provider.of<AuthRepository>(
+                              context,
+                              listen: false);
+
+                          final result = await authRepository.login(
                             email: email!,
                             password: password!,
                           );
@@ -129,6 +135,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             },
                             (user) {
+                              // Update the UserProvider with the new user data
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .setUser(user);
+
                               showSnackBar(
                                 context,
                                 'You have successfully logged in.',

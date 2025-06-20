@@ -5,6 +5,7 @@
     <application
         android:label="ai_tumor_detect"
         android:name="${applicationName}"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
